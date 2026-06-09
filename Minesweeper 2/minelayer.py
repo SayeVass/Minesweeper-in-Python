@@ -1,6 +1,5 @@
 import random
 import minefield
-import tile
 
 class Minelayer():
 

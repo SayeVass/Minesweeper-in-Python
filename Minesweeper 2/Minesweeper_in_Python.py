@@ -3,7 +3,6 @@ import sys
 
 import minefield
 import minelayer
-import tile
 
 pygame.init()
 
@@ -132,11 +131,62 @@ def startMenu():
 
         pygame.display.update()
 
+def gameOverRender(mf, clickedTile, buttonSize):
+
+    bomb = pygame.image.load('Bomb.png')
+    bomb = pygame.transform.scale(bomb, (buttonSize, buttonSize))
+
+    boom = pygame.image.load('Boom.png')
+    boom = pygame.transform.scale(boom, (buttonSize, buttonSize))
+
+    screen.fill(BG)
+
+    for tile in range(len(mf.field)):
+        pygame.draw.rect(screen, LIGHT if mf.field[tile].clicked else DARK, mf.field[tile].button)
+    
+        if mf.field[tile].clicked:
+
+            match mf.field[tile].neighborBombs:
+                case 0:
+                    bombCounterColor = LIGHT
+                case 1:
+                    bombCounterColor = (40, 150, 0)
+                case 2:
+                    bombCounterColor = (0, 40, 150)
+                case 3:
+                    bombCounterColor = (175, 155, 0)
+                case 4:
+                    bombCounterColor = (200, 125, 20)
+                case 5:
+                    bombCounterColor = RED
+                case 6:
+                    bombCounterColor = RED
+                case 7:
+                    bombCounterColor = RED
+                case 8:
+                    bombCounterColor = RED
+                
+            shownNumber = font.render(str(mf.field[tile].neighborBombs), True, bombCounterColor)
+
+            screen.blit(shownNumber, shownNumber.get_rect(center=mf.field[tile].button.center))
+
+        elif mf.field[tile].bomb:
+
+            if tile != clickedTile:
+                screen.blit(bomb, bomb.get_rect(center=mf.field[tile].button.center))
+            else:
+                screen.blit(boom, boom.get_rect(center=mf.field[tile].button.center))
+        
+    gameOverBG = pygame.Surface([screenSize, screenSize], pygame.SRCALPHA, 32)
+    gameOverBG = gameOverBG.convert_alpha()
+    gameOverBG.fill((40, 40, 40, 100))
+
+    screen.blit(gameOverBG, (0, 0))
+
 def gameOver():
 
     while True:
 
-        screen.fill(BG)
         mouse = pygame.mouse.get_pos()
 
         restartButton = pygame.Rect(300, 300, 140, 50)
@@ -299,6 +349,7 @@ def game(size):
 
                                 if currentMinefield.field[btn1].clickTile():
                                     print("Bomb exploded! Game over!")
+                                    gameOverRender(currentMinefield, btn1, buttonSize)
                                     gameOver()
                                 else:
                                     currentMinefield.field[btn1].clickTile()
@@ -313,6 +364,7 @@ def game(size):
 
                                 if currentMinefield.field[btn1].clickTile():
                                     print("Bomb exploded! Game over!")
+                                    gameOverRender(currentMinefield, btn1, buttonSize)
                                     gameOver()
                                 else:
                                     print("No bomb. Continue.")
