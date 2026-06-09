@@ -267,6 +267,9 @@ def game(size):
     gap = 2
     buttonSize = (screenSize - ((pad * 2) + (gap * (size - 1)))) / size
     
+    redFlag = pygame.image.load('flag.png')
+    redFlag = pygame.transform.scale(redFlag, (buttonSize, buttonSize))
+
     tilesRemainingCount = 0
 
     i = 0
@@ -333,11 +336,11 @@ def game(size):
                                 print("Tile", btn1, "Unflagged")
                             currentMinefield.field[btn1].flagTile()
 
-                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].flagged == True:
+                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].flagged:
                             print("Tile", btn1, "currently flagged. Nothing changed.")     
                             
-                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked == True:
-                            print("Tile already checked. Let's not tempt fate by checking again.")
+                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked:
+                            print("Tile", btn, "already checked. Let's not tempt fate by checking again.")
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].flagged:
                             print("I'm not going to flag an empty plot.")
@@ -401,8 +404,8 @@ def game(size):
                 screen.blit(shownNumber, shownNumber.get_rect(center=currentMinefield.field[btn].button.center))
 
             if currentMinefield.field[btn].flagged:
-                shownFlag = font.render("X", True, RED)
-                screen.blit(shownFlag, shownFlag.get_rect(center=currentMinefield.field[btn].button.center))
+
+                screen.blit(redFlag, redFlag.get_rect(center=currentMinefield.field[btn].button.center))
 
         tilesRemainingCount = 0
 
