@@ -186,7 +186,7 @@ def startMenu():
                         if difficultyOption.buttonClicked == True:
                             gameDifficulty = difficultyOption.value
 
-                    game(gameBoardSize, gameDifficulty)
+                    game(int(gameBoardSize), gameDifficulty)
 
                 elif quitButton.rectangle.collidepoint(mouse):
                     pygame.quit()
@@ -201,8 +201,6 @@ def startMenu():
                     customButton.value = customButton.value[:-1]
                 elif event.unicode.isdecimal() and len(customButton.value) < 2:
                     customButton.value += event.unicode
-                elif event.key == pygame.K_RETURN and len(customButton.value) > 0:
-                    game(int(customButton.value))
 
         pygame.display.update()
 
