@@ -3,6 +3,7 @@ import sys
 
 import minefield
 import minelayer
+import optionButton
 
 pygame.init()
 
@@ -27,68 +28,94 @@ def startMenu():
     active = False
 
     #Establishing the rectangles to be drawn on screen
-    playButton = pygame.Rect(280, 220, 180, 50)
-    quitButton = pygame.Rect(300, 380, 140, 50)
+    boardSizeButton = optionButton.OptionButton(pygame.Rect(screenSize / 10, (screenSize * .4) - 25, 180, 50), 0, False)    
 
-    tenButton = pygame.Rect(280, 290, 40, 50)
-    fifteenButton = pygame.Rect(325, 290, 40, 50)
-    twentyfiveButton = pygame.Rect(370, 290, 40, 50)
+    tenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize * .4) - 25, 40, 50), 10, False)
+    fifteenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 280, (screenSize * .4) - 25, 40, 50), 15, True)
+    twentyfiveButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 330, (screenSize * .4) - 25, 40, 50), 25, False)
 
-    customButton = pygame.Rect(415, 290, 40, 50)
-    textInputBox = pygame.Rect(420, 315, 30, 20)
+    customButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 380, (screenSize * .4) - 25, 40, 50), textInput, False)
+    textInputBox = pygame.Rect((screenSize / 10) + 385, (screenSize * .4), 30, 20)
 
+    difficultyButton = optionButton.OptionButton(pygame.Rect(screenSize / 10 , (screenSize / 2) - 25, 180, 50), 0, False)
+
+    easyButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize / 2) - 25, 80, 50), 10, False)
+    normalButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 320, (screenSize / 2) - 25, 100, 50), 5, True)
+    hardButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 430, (screenSize / 2) - 25, 80, 50), 4, False)
+
+    playButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) - 160, (screenSize * .7) - 25, 140, 50), 0, False)
+    quitButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) + 20, (screenSize * .7) - 25, 140, 50), 0, False)
+
+    #Setting up the text to be drawn on screen
     titleText = font.render("Minesweeper", True, WHITE)
     subtitleText = font.render("Now in Python!", True, WHITE)
 
-    playText = font.render("Board Size", True, WHITE)
-    quitText = font.render("Quit", True, WHITE)
+    boardSizeText = font.render("Board Size", True, WHITE)
 
     tenText = font.render("10", True, WHITE)
     fifteenText = font.render("15", True, WHITE)
     twentyfiveText = font.render("25", True, WHITE)
 
     customText = smallFont.render("Custom", True, WHITE)
-    texttextInput = smallFont.render(textInput, True, BLACK)
+    texttextInput = smallFont.render(customButton.value, True, BLACK)
 
-    playText = font.render("Board Size", True, WHITE)
+    difficultyText = font.render("Difficulty", True, WHITE)
+
+    easyText = font.render("Easy", True, WHITE)
+    normalText = font.render("Normal", True, WHITE)
+    hardText = font.render("Hard", True, WHITE)
+
+    playText = font.render("Play", True, WHITE)
     quitText = font.render("Quit", True, WHITE)
 
-    tenText = font.render("10", True, WHITE)
-    fifteenText = font.render("15", True, WHITE)
-    twentyfiveText = font.render("25", True, WHITE)
-
-    customText = smallFont.render("Custom", True, WHITE)
+    screen.fill(BG)
 
     while True:
 
-        screen.fill(BG)
         mouse = pygame.mouse.get_pos()
 
         #Drawing rectangles for the buttons on screen
-        pygame.draw.rect(screen, DARK, playButton)
-        pygame.draw.rect(screen, LIGHT if quitButton.collidepoint(mouse) else DARK, quitButton)
 
-        pygame.draw.rect(screen, LIGHT if tenButton.collidepoint(mouse) else DARK, tenButton)
-        pygame.draw.rect(screen, LIGHT if fifteenButton.collidepoint(mouse) else DARK, fifteenButton)
-        pygame.draw.rect(screen, LIGHT if twentyfiveButton.collidepoint(mouse) else DARK, twentyfiveButton)
+        pygame.draw.rect(screen, DARK, boardSizeButton.rectangle)
 
-        pygame.draw.rect(screen, LIGHT if customButton.collidepoint(mouse) and not textInputBox.collidepoint(mouse) else DARK, customButton)
+        pygame.draw.rect(screen, LIGHT if tenButton.buttonClicked or tenButton.rectangle.collidepoint(mouse) else DARK, tenButton.rectangle)
+        pygame.draw.rect(screen, LIGHT if fifteenButton.buttonClicked or fifteenButton.rectangle.collidepoint(mouse) else DARK, fifteenButton.rectangle)
+        pygame.draw.rect(screen, LIGHT if twentyfiveButton.buttonClicked or twentyfiveButton.rectangle.collidepoint(mouse) else DARK, twentyfiveButton.rectangle)
+
+        pygame.draw.rect(screen, LIGHT if customButton.buttonClicked == True or customButton.rectangle.collidepoint(mouse) and not textInputBox.collidepoint(mouse) else DARK, customButton.rectangle)
         pygame.draw.rect(screen, WHITE, textInputBox)
 
+        pygame.draw.rect(screen, DARK, difficultyButton.rectangle)
+
+        pygame.draw.rect(screen, LIGHT if easyButton.rectangle.collidepoint(mouse) or easyButton.buttonClicked else DARK, easyButton.rectangle)
+        pygame.draw.rect(screen, LIGHT if normalButton.rectangle.collidepoint(mouse) or normalButton.buttonClicked else DARK, normalButton.rectangle)
+        pygame.draw.rect(screen, LIGHT if hardButton.rectangle.collidepoint(mouse) or hardButton.buttonClicked else DARK, hardButton.rectangle)
+
+        pygame.draw.rect(screen, LIGHT if playButton.rectangle.collidepoint(mouse) else DARK, playButton.rectangle)
+        pygame.draw.rect(screen, LIGHT if quitButton.rectangle.collidepoint(mouse) else DARK, quitButton.rectangle)
+
         #Rendering the text onto the buttons
-        texttextInput = smallFont.render(textInput, True, BLACK)
+        texttextInput = smallFont.render(customButton.value, True, BLACK)
 
-        screen.blit(titleText, (265, 100))
-        screen.blit(subtitleText, (250, 150))
+        screen.blit(titleText, ((screenSize / 2) - (titleText.get_width() / 2) , (screenSize / 5) - (titleText.get_height() / 2)))
+        screen.blit(subtitleText, ((screenSize / 2) - (subtitleText.get_width() / 2), (screenSize / 5) + (titleText.get_height() / 2) + 5))
 
-        screen.blit(playText, playText.get_rect(center=playButton.center))
-        screen.blit(quitText, quitText.get_rect(center=quitButton.center))
+        screen.blit(boardSizeText, boardSizeText.get_rect(center=boardSizeButton.rectangle.center))
 
-        screen.blit(tenText, tenText.get_rect(center=tenButton.center))
-        screen.blit(fifteenText, fifteenText.get_rect(center=fifteenButton.center))
-        screen.blit(twentyfiveText, twentyfiveText.get_rect(center=twentyfiveButton.center))
+        screen.blit(tenText, tenText.get_rect(center=tenButton.rectangle.center))
+        screen.blit(fifteenText, fifteenText.get_rect(center=fifteenButton.rectangle.center))
+        screen.blit(twentyfiveText, twentyfiveText.get_rect(center=twentyfiveButton.rectangle.center))
 
         screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+
+        screen.blit(difficultyText, difficultyText.get_rect(center=difficultyButton.rectangle.center))
+
+        screen.blit(easyText, easyText.get_rect(center=easyButton.rectangle.center))
+        screen.blit(normalText, normalText.get_rect(center=normalButton.rectangle.center))
+        screen.blit(hardText, hardText.get_rect(center=hardButton.rectangle.center))
+
+        screen.blit(playText, playText.get_rect(center=playButton.rectangle.center))
+        screen.blit(quitText, quitText.get_rect(center=quitButton.rectangle.center))
 
         for event in pygame.event.get():
 
@@ -98,22 +125,70 @@ def startMenu():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
 
-                if tenButton.collidepoint(mouse):
-                    game(10)
+                if tenButton.rectangle.collidepoint(mouse):
+                    tenButton.click()
 
-                elif fifteenButton.collidepoint(mouse):
-                    game(15)
+                    fifteenButton.unclick()
+                    twentyfiveButton.unclick()
+                    customButton.unclick()
 
-                elif twentyfiveButton.collidepoint(mouse):
-                    game(25)
+                elif fifteenButton.rectangle.collidepoint(mouse):
+                    fifteenButton.click()
+
+                    tenButton.unclick()
+                    twentyfiveButton.unclick()
+                    customButton.unclick()
+
+                elif twentyfiveButton.rectangle.collidepoint(mouse):
+                    twentyfiveButton.click()
+
+                    tenButton.unclick()
+                    fifteenButton.unclick()
+                    customButton.unclick()
 
                 elif textInputBox.collidepoint(mouse):
                     active = True
 
-                elif customButton.collidepoint(mouse) and len(textInput) > 0:
-                    game(int(textInput))
+                elif customButton.rectangle.collidepoint(mouse) and len(textInput) > 0:
+                    customButton.click()
 
-                elif quitButton.collidepoint(mouse):
+                    tenButton.unclick()
+                    fifteenButton.unclick()
+                    twentyfiveButton.unclick()
+
+                elif easyButton.rectangle.collidepoint(mouse):
+                    easyButton.click()
+
+                    normalButton.unclick()
+                    hardButton.unclick()
+
+                elif normalButton.rectangle.collidepoint(mouse):
+                    normalButton.click()
+
+                    easyButton.unclick()
+                    hardButton.unclick()
+
+                elif hardButton.rectangle.collidepoint(mouse):
+                    hardButton.click()
+
+                    easyButton.unclick()
+                    normalButton.unclick()
+
+                elif playButton.rectangle.collidepoint(mouse):
+                    boardSizeList = [tenButton, fifteenButton, twentyfiveButton, customButton]
+                    difficultyList = [easyButton, normalButton, hardButton]
+
+                    for sizeOption in boardSizeList:
+                        if sizeOption.buttonClicked == True:
+                            gameBoardSize = sizeOption.value
+
+                    for difficultyOption in difficultyList:
+                        if difficultyOption.buttonClicked == True:
+                            gameDifficulty = difficultyOption.value
+
+                    game(gameBoardSize, gameDifficulty)
+
+                elif quitButton.rectangle.collidepoint(mouse):
                     pygame.quit()
                     sys.exit()
 
@@ -122,12 +197,12 @@ def startMenu():
 
             if event.type == pygame.KEYDOWN and active:
 
-                if event.key == pygame.K_BACKSPACE and len(textInput) > 0:
-                    textInput = textInput[:-1]
-                elif event.unicode.isdecimal() and len(textInput) < 2:
-                    textInput += event.unicode
-                elif event.key == pygame.K_RETURN and len(textInput) > 0:
-                    game(int(textInput))
+                if event.key == pygame.K_BACKSPACE and len(customButton.value) > 0:
+                    customButton.value = customButton.value[:-1]
+                elif event.unicode.isdecimal() and len(customButton.value) < 2:
+                    customButton.value += event.unicode
+                elif event.key == pygame.K_RETURN and len(customButton.value) > 0:
+                    game(int(customButton.value))
 
         pygame.display.update()
 
@@ -256,12 +331,12 @@ def gameWin():
 
         pygame.display.update()
 
-def game(size):
+def game(size, difficulty):
 
     fakeMinefield = minefield.Minefield(size)
     currentMinefield = fakeMinefield
 
-    ml = minelayer.Minelayer(size)
+    ml = minelayer.Minelayer(size, difficulty)
 
     pad = 5
     gap = 2

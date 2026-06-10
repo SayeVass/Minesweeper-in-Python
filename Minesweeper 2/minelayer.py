@@ -4,14 +4,17 @@ import minefield
 class Minelayer():
 
     initialSize = 0
+    difficulty = 0
     sizeSquared = initialSize * initialSize
 
     minesLaid = []
 
-    def __init__(self, initialSize):
+    def __init__(self, initialSize, difficulty):
 
         self.initialSize = initialSize
         self.sizeSquared = initialSize * initialSize
+
+        self.difficulty = difficulty
 
     def layMines(self, clickedTile):
 
@@ -28,7 +31,7 @@ class Minelayer():
             if i % self.sizeSquared not in self.minesLaid and i % self.sizeSquared not in safeTiles:
                 self.mine(mf.field[i % self.sizeSquared], i)
 
-                if len(self.minesLaid) > self.sizeSquared / 5:
+                if len(self.minesLaid) > self.sizeSquared / self.difficulty:
                     break
 
             i += 1
