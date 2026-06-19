@@ -28,23 +28,24 @@ def startMenu():
     active = False
 
     #Establishing the rectangles to be drawn on screen
-    boardSizeButton = optionButton.OptionButton(pygame.Rect(screenSize / 10, (screenSize * .4) - 25, 180, 50), 0, False)    
 
-    tenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize * .4) - 25, 40, 50), 10, False)
-    fifteenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 280, (screenSize * .4) - 25, 40, 50), 15, True)
-    twentyfiveButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 330, (screenSize * .4) - 25, 40, 50), 25, False)
+    boardSizeButton = optionButton.OptionButton(pygame.Rect(screenSize / 10, (screenSize * .4) - 10, 180, 30), 0, False)    
 
-    customButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 380, (screenSize * .4) - 25, 40, 50), textInput, False)
-    textInputBox = pygame.Rect((screenSize / 10) + 385, (screenSize * .4), 30, 20)
+    tenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize * .4) - 10, 40, 30), 10, False)
+    fifteenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 280, (screenSize * .4) - 10, 40, 30), 15, True)
+    twentyfiveButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 330, (screenSize * .4) - 10, 40, 30), 25, False)
 
-    difficultyButton = optionButton.OptionButton(pygame.Rect(screenSize / 10 , (screenSize / 2) - 25, 180, 50), 0, False)
+    customButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 380, (screenSize * .4) - 10, 40, 30), textInput, False)
+    textInputBox = pygame.Rect((screenSize / 10) + 385, (screenSize * .4) - 5, 30, 20)
 
-    easyButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize / 2) - 25, 80, 50), 10, False)
-    normalButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 320, (screenSize / 2) - 25, 100, 50), 5, True)
-    hardButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 430, (screenSize / 2) - 25, 80, 50), 4, False)
+    difficultyButton = optionButton.OptionButton(pygame.Rect(screenSize / 10 , (screenSize / 2) - 10, 180, 30), 0, False)
 
-    playButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) - 160, (screenSize * .7) - 25, 140, 50), 0, False)
-    quitButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) + 20, (screenSize * .7) - 25, 140, 50), 0, False)
+    easyButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize / 2) - 10, 80, 30), 10, False)
+    normalButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 320, (screenSize / 2) - 10, 100, 30), 5, True)
+    hardButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 430, (screenSize / 2) - 10, 80, 30), 4, False)
+
+    playButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) - 160, (screenSize * .6) - 25, 140, 50), 0, False)
+    quitButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) + 20, (screenSize * .6) - 25, 140, 50), 0, False)
 
     #Setting up the text to be drawn on screen
     titleText = font.render("Minesweeper", True, WHITE)
@@ -56,7 +57,6 @@ def startMenu():
     fifteenText = font.render("15", True, WHITE)
     twentyfiveText = font.render("25", True, WHITE)
 
-    customText = smallFont.render("Custom", True, WHITE)
     texttextInput = smallFont.render(customButton.value, True, BLACK)
 
     difficultyText = font.render("Difficulty", True, WHITE)
@@ -70,12 +70,14 @@ def startMenu():
 
     screen.fill(BG)
 
+    tick = 0
+
     while True:
 
         mouse = pygame.mouse.get_pos()
 
         #Drawing rectangles for the buttons on screen
-
+        
         pygame.draw.rect(screen, DARK, boardSizeButton.rectangle)
 
         pygame.draw.rect(screen, LIGHT if tenButton.buttonClicked or tenButton.rectangle.collidepoint(mouse) else DARK, tenButton.rectangle)
@@ -97,8 +99,8 @@ def startMenu():
         #Rendering the text onto the buttons
         texttextInput = smallFont.render(customButton.value, True, BLACK)
 
-        screen.blit(titleText, ((screenSize / 2) - (titleText.get_width() / 2) , (screenSize / 5) - (titleText.get_height() / 2)))
-        screen.blit(subtitleText, ((screenSize / 2) - (subtitleText.get_width() / 2), (screenSize / 5) + (titleText.get_height() / 2) + 5))
+        screen.blit(titleText, ((screenSize / 2) - (titleText.get_width() / 2) , (screenSize / 4) - (titleText.get_height() / 2)))
+        screen.blit(subtitleText, ((screenSize / 2) - (subtitleText.get_width() / 2), (screenSize / 4) + (titleText.get_height() / 2) + 5))
 
         screen.blit(boardSizeText, boardSizeText.get_rect(center=boardSizeButton.rectangle.center))
 
@@ -106,7 +108,14 @@ def startMenu():
         screen.blit(fifteenText, fifteenText.get_rect(center=fifteenButton.rectangle.center))
         screen.blit(twentyfiveText, twentyfiveText.get_rect(center=twentyfiveButton.rectangle.center))
 
-        screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+        if tick > 499 and active:
+            texttextInput = smallFont.render(customButton.value + "|", True, BLACK)
+            screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+        else:
+            texttextInput = smallFont.render(customButton.value, True, BLACK)
+            screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+
+        tick = (tick + 1) % 999
 
         screen.blit(difficultyText, difficultyText.get_rect(center=difficultyButton.rectangle.center))
 
@@ -123,7 +132,7 @@ def startMenu():
                 pygame.quit()
                 sys.exit()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 
                 if tenButton.rectangle.collidepoint(mouse):
                     tenButton.click()
@@ -412,8 +421,8 @@ def game(size, difficulty):
                         elif leftClick == True & rightClick == False & currentMinefield.field[btn1].flagged:
                             print("Tile", btn1, "currently flagged. Nothing changed.")     
                             
-                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked:
-                            print("Tile", btn, "already checked. Let's not tempt fate by checking again.")
+                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked == True:
+                            print("Tile", btn, "already checked.")
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].flagged:
                             print("I'm not going to flag an empty plot.")
