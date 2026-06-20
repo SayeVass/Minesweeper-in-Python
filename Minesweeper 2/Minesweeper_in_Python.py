@@ -521,6 +521,14 @@ def game(size, difficulty):
                                 else:
                                     print("No bomb. Continue.")
                                     currentMinefield.field[btn1].clickTile()
+                        
+                        if currentMinefield != fakeMinefield:
+                            for checkTile in range(len(currentMinefield.field)):
+                                if currentMinefield.field[checkTile].clicked == False and currentMinefield.field[checkTile].bomb == False:
+                                    winFlag = False
+
+                            if winFlag == True:
+                                gameWin()
                     
         btn = 0
         for btn in range(len(currentMinefield.field)):
@@ -555,15 +563,7 @@ def game(size, difficulty):
             if currentMinefield.field[btn].flagged:
 
                 screen.blit(redFlag, redFlag.get_rect(center=currentMinefield.field[btn].button.center))
-
-        if currentMinefield != fakeMinefield:
-            for checkTile in range(len(currentMinefield.field)):
-                if currentMinefield.field[checkTile].clicked == False and currentMinefield.field[checkTile].bomb == False:
-                    winFlag = False
-
-            if winFlag == True:
-                gameWin()
-
+        
         pygame.display.update()
 
 def gameLoader():
