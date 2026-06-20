@@ -5,12 +5,13 @@ import sys
 import minefield
 import minelayer
 import optionButton
+import timer
 
 pygame.init()
 
 screenSize = 720
 
-screen = pygame.display.set_mode((screenSize, screenSize))
+screen = pygame.display.set_mode((screenSize, screenSize + 60))
 pygame.display.set_caption("Minesweeper in Python")
 
 WHITE = (255,255,255)
@@ -22,6 +23,7 @@ BG = (60,25,60)
 
 font = pygame.font.SysFont("Courier", 25)
 smallFont = pygame.font.SysFont("Courier", 15)
+clockFont = pygame.font.SysFont("Lucida Console", 25)
 
 def startMenu(savedBoardSize, savedCustomSize, savedDifficulty):
 
@@ -280,7 +282,7 @@ def startMenu(savedBoardSize, savedCustomSize, savedDifficulty):
 
         pygame.display.update()
 
-def gameOverRender(mf, clickedTile, buttonSize):
+def gameOverRender(mf, clickedTile, buttonSize, timerBox, shownTime):
 
     bomb = pygame.image.load('Bomb.png')
     bomb = pygame.transform.scale(bomb, (buttonSize, buttonSize))
@@ -289,6 +291,9 @@ def gameOverRender(mf, clickedTile, buttonSize):
     boom = pygame.transform.scale(boom, (buttonSize, buttonSize))
 
     screen.fill(BG)
+
+    pygame.draw.rect(screen, BLACK, timerBox)
+    screen.blit(shownTime, shownTime.get_rect(center=timerBox.center))
 
     for tile in range(len(mf.field)):
         pygame.draw.rect(screen, LIGHT if mf.field[tile].clicked else DARK, mf.field[tile].button)
@@ -326,7 +331,7 @@ def gameOverRender(mf, clickedTile, buttonSize):
             else:
                 screen.blit(boom, boom.get_rect(center=mf.field[tile].button.center))
         
-    gameOverBG = pygame.Surface([screenSize, screenSize], pygame.SRCALPHA, 32)
+    gameOverBG = pygame.Surface([screenSize + 60, screenSize + 60], pygame.SRCALPHA, 32)
     gameOverBG = gameOverBG.convert_alpha()
     gameOverBG.fill((40, 40, 40, 100))
 
@@ -412,6 +417,9 @@ def game(size, difficulty):
 
     ml = minelayer.Minelayer(size, difficulty)
 
+    gameTimer = timer.Timer()
+
+    timerSpace = 60
     pad = 5
     gap = 2
     buttonSize = (screenSize - ((pad * 2) + (gap * (size - 1)))) / size
@@ -419,15 +427,23 @@ def game(size, difficulty):
     redFlag = pygame.image.load('flag.png')
     redFlag = pygame.transform.scale(redFlag, (buttonSize, buttonSize))
 
+    timerBox = pygame.Rect(screenSize / 2 - 90, pad, 160, 50)
+    shownTime = clockFont.render(str(gameTimer.getTime())[3:], True, WHITE)
+
     i = 0
 
     for i in range(len(fakeMinefield.field)):
 
-        btnPosHgt = 5 + (buttonSize * (i % size)) + (gap + (i % size))
+        btnPosHgt = pad + (buttonSize * (i % size)) + (gap + (i % size))
         
-        btnPosWid = 5 + (buttonSize * (i // size)) + (gap * (i // size))
+        btnPosWid = timerSpace + pad + (buttonSize * (i // size)) + (gap * (i // size))
         
         fakeMinefield.field[i].button = pygame.Rect(btnPosHgt, btnPosWid, buttonSize, buttonSize)
+    
+    screen.fill(BG)
+
+    pygame.draw.rect(screen, BLACK, timerBox)
+    screen.blit(shownTime, shownTime.get_rect(center=timerBox.center))
 
     while True:
 
@@ -436,8 +452,6 @@ def game(size, difficulty):
         pygame.event.pump()
 
         mouse = pygame.mouse.get_pos()
-        keys = pygame.key.get_pressed()
-        screen.fill(BG)
 
         for event in pygame.event.get():
             
@@ -501,7 +515,7 @@ def game(size, difficulty):
 
                                 if currentMinefield.field[btn1].clickTile():
                                     print("Bomb exploded! Game over!")
-                                    gameOverRender(currentMinefield, btn1, buttonSize)
+                                    gameOverRender(currentMinefield, btn1, buttonSize, timerBox, shownTime)
                                     gameOver()
                                 else:
                                     currentMinefield.field[btn1].clickTile()
@@ -516,7 +530,7 @@ def game(size, difficulty):
 
                                 if currentMinefield.field[btn1].clickTile():
                                     print("Bomb exploded! Game over!")
-                                    gameOverRender(currentMinefield, btn1, buttonSize)
+                                    gameOverRender(currentMinefield, btn1, buttonSize, timerBox, shownTime)
                                     gameOver()
                                 else:
                                     print("No bomb. Continue.")
@@ -529,7 +543,12 @@ def game(size, difficulty):
 
                             if winFlag == True:
                                 gameWin()
-                    
+        
+        if currentMinefield != fakeMinefield:
+            shownTime = clockFont.render(str(gameTimer.getTime())[3:], True, WHITE)
+            pygame.draw.rect(screen, BLACK, timerBox)
+            screen.blit(shownTime, shownTime.get_rect(center=timerBox.center))
+
         btn = 0
         for btn in range(len(currentMinefield.field)):
             pygame.draw.rect(screen, LIGHT if currentMinefield.field[btn].clicked else DARK, currentMinefield.field[btn].button)
