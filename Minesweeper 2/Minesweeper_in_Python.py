@@ -1,3 +1,4 @@
+import os
 import pygame
 import sys
 
@@ -22,9 +23,9 @@ BG = (60,25,60)
 font = pygame.font.SysFont("Courier", 25)
 smallFont = pygame.font.SysFont("Courier", 15)
 
-def startMenu():
+def startMenu(savedBoardSize, savedCustomSize, savedDifficulty):
 
-    textInput = "35"
+    textInput = savedCustomSize
     active = False
 
     #Establishing the rectangles to be drawn on screen
@@ -32,7 +33,7 @@ def startMenu():
     boardSizeButton = optionButton.OptionButton(pygame.Rect(screenSize / 10, (screenSize * .4) - 10, 180, 30), 0, False)    
 
     tenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize * .4) - 10, 40, 30), 10, False)
-    fifteenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 280, (screenSize * .4) - 10, 40, 30), 15, True)
+    fifteenButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 280, (screenSize * .4) - 10, 40, 30), 15, False)
     twentyfiveButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 330, (screenSize * .4) - 10, 40, 30), 25, False)
 
     customButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 380, (screenSize * .4) - 10, 40, 30), textInput, False)
@@ -41,11 +42,32 @@ def startMenu():
     difficultyButton = optionButton.OptionButton(pygame.Rect(screenSize / 10 , (screenSize / 2) - 10, 180, 30), 0, False)
 
     easyButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 230, (screenSize / 2) - 10, 80, 30), 10, False)
-    normalButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 320, (screenSize / 2) - 10, 100, 30), 5, True)
+    normalButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 320, (screenSize / 2) - 10, 100, 30), 5, False)
     hardButton = optionButton.OptionButton(pygame.Rect((screenSize / 10) + 430, (screenSize / 2) - 10, 80, 30), 4, False)
 
     playButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) - 160, (screenSize * .6) - 25, 140, 50), 0, False)
     quitButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) + 20, (screenSize * .6) - 25, 140, 50), 0, False)
+
+    saveButton = optionButton.OptionButton(pygame.Rect(screenSize - 205, screenSize - 35, 200, 30), 0, False)
+
+    #Clicking the saved settings
+    match savedBoardSize:
+        case '10':
+            tenButton.click()
+        case '15':
+            fifteenButton.click()
+        case '25':
+            twentyfiveButton.click()
+        case _:
+            customButton.click()
+    
+    match savedDifficulty:
+        case '0':
+            easyButton.click()
+        case '1':
+            normalButton.click()
+        case '2':
+            hardButton.click()
 
     #Setting up the text to be drawn on screen
     titleText = font.render("Minesweeper", True, WHITE)
@@ -57,7 +79,7 @@ def startMenu():
     fifteenText = font.render("15", True, WHITE)
     twentyfiveText = font.render("25", True, WHITE)
 
-    texttextInput = smallFont.render(customButton.value, True, BLACK)
+    texttextInput = smallFont.render(str(customButton.value), True, BLACK)
 
     difficultyText = font.render("Difficulty", True, WHITE)
 
@@ -67,6 +89,8 @@ def startMenu():
 
     playText = font.render("Play", True, WHITE)
     quitText = font.render("Quit", True, WHITE)
+
+    saveText = font.render("Save Settings", True, WHITE)
 
     screen.fill(BG)
 
@@ -96,8 +120,10 @@ def startMenu():
         pygame.draw.rect(screen, LIGHT if playButton.rectangle.collidepoint(mouse) else DARK, playButton.rectangle)
         pygame.draw.rect(screen, LIGHT if quitButton.rectangle.collidepoint(mouse) else DARK, quitButton.rectangle)
 
+        pygame.draw.rect(screen, LIGHT if saveButton.rectangle.collidepoint(mouse) else DARK, saveButton.rectangle)
+
         #Rendering the text onto the buttons
-        texttextInput = smallFont.render(customButton.value, True, BLACK)
+        texttextInput = smallFont.render(str(customButton.value), True, BLACK)
 
         screen.blit(titleText, ((screenSize / 2) - (titleText.get_width() / 2) , (screenSize / 4) - (titleText.get_height() / 2)))
         screen.blit(subtitleText, ((screenSize / 2) - (subtitleText.get_width() / 2), (screenSize / 4) + (titleText.get_height() / 2) + 5))
@@ -109,11 +135,11 @@ def startMenu():
         screen.blit(twentyfiveText, twentyfiveText.get_rect(center=twentyfiveButton.rectangle.center))
 
         if tick > 499 and active:
-            texttextInput = smallFont.render(customButton.value + "|", True, BLACK)
-            screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+            texttextInput = smallFont.render(str(customButton.value) + "|", True, BLACK)
+            screen.blit(texttextInput, texttextInput.get_rect(midleft=textInputBox.midleft))
         else:
-            texttextInput = smallFont.render(customButton.value, True, BLACK)
-            screen.blit(texttextInput, texttextInput.get_rect(center=textInputBox.center))
+            texttextInput = smallFont.render(str(customButton.value), True, BLACK)
+            screen.blit(texttextInput, texttextInput.get_rect(midleft=textInputBox.midleft))
 
         tick = (tick + 1) % 999
 
@@ -126,6 +152,8 @@ def startMenu():
         screen.blit(playText, playText.get_rect(center=playButton.rectangle.center))
         screen.blit(quitText, quitText.get_rect(center=quitButton.rectangle.center))
 
+        screen.blit(saveText, saveText.get_rect(center=saveButton.rectangle.center))
+
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -137,6 +165,7 @@ def startMenu():
                 if tenButton.rectangle.collidepoint(mouse):
                     tenButton.click()
 
+                    active = False
                     fifteenButton.unclick()
                     twentyfiveButton.unclick()
                     customButton.unclick()
@@ -144,6 +173,7 @@ def startMenu():
                 elif fifteenButton.rectangle.collidepoint(mouse):
                     fifteenButton.click()
 
+                    active = False
                     tenButton.unclick()
                     twentyfiveButton.unclick()
                     customButton.unclick()
@@ -151,14 +181,21 @@ def startMenu():
                 elif twentyfiveButton.rectangle.collidepoint(mouse):
                     twentyfiveButton.click()
 
+                    active = False
                     tenButton.unclick()
                     fifteenButton.unclick()
                     customButton.unclick()
 
                 elif textInputBox.collidepoint(mouse):
                     active = True
+                    customButton.click()
 
-                elif customButton.rectangle.collidepoint(mouse) and len(textInput) > 0:
+                    tenButton.unclick()
+                    fifteenButton.unclick()
+                    twentyfiveButton.unclick()
+
+                elif customButton.rectangle.collidepoint(mouse):
+                    active = True
                     customButton.click()
 
                     tenButton.unclick()
@@ -170,18 +207,47 @@ def startMenu():
 
                     normalButton.unclick()
                     hardButton.unclick()
+                    active = False
 
                 elif normalButton.rectangle.collidepoint(mouse):
                     normalButton.click()
 
                     easyButton.unclick()
                     hardButton.unclick()
+                    active = False
 
                 elif hardButton.rectangle.collidepoint(mouse):
                     hardButton.click()
 
                     easyButton.unclick()
                     normalButton.unclick()
+                    active = False
+
+                elif saveButton.rectangle.collidepoint(mouse):
+                    boardSizeList = [tenButton, fifteenButton, twentyfiveButton, customButton]
+                    difficultyList = [easyButton, normalButton, hardButton]
+
+                    for sizeOption in boardSizeList:
+                        if sizeOption.buttonClicked == True:
+                            saveSize = sizeOption.value
+                    
+                    optionIndex = 0
+                    for difficultyOption in difficultyList:
+                        if difficultyOption.buttonClicked == True:
+                            saveDifficulty = optionIndex
+                        optionIndex += 1
+
+                    savefile = open('settings.sav', 'w')
+                    savefile.truncate(0)
+                    savefile.close
+
+                    savefile = open('settings.sav', 'a')
+                    savefile.write(str(saveSize))
+                    savefile.write(',')
+                    savefile.write(str(customButton.value))
+                    savefile.write(',')
+                    savefile.write(str(saveDifficulty))
+                    print("Current settings saved.")
 
                 elif playButton.rectangle.collidepoint(mouse):
                     boardSizeList = [tenButton, fifteenButton, twentyfiveButton, customButton]
@@ -292,7 +358,7 @@ def gameOver():
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if restartButton.collidepoint(mouse):
-                    startMenu()
+                    gameLoader()
 
                 if quitButton.collidepoint(mouse):
                     pygame.quit()
@@ -330,7 +396,7 @@ def gameWin():
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if restartButton.collidepoint(mouse):
-                    startMenu()
+                    gameLoader()
 
                 if quitButton.collidepoint(mouse):
                     pygame.quit()
@@ -352,7 +418,7 @@ def game(size, difficulty):
     redFlag = pygame.image.load('flag.png')
     redFlag = pygame.transform.scale(redFlag, (buttonSize, buttonSize))
 
-    tilesRemainingCount = 0
+    tilesRemainingCount = size * size
 
     i = 0
 
@@ -404,12 +470,14 @@ def game(size, difficulty):
                                 mf.field[btnLocation].button = fakeMinefield.field[btnLocation].button
 
                             currentMinefield.field[btn1].clickTile()
+                            tilesRemainingCount -= 1
                             adjacentZeroTiles = currentMinefield.checkForZeros(currentMinefield.field, btn1, size, [btn1])
 
                             #print(adjacentZeroTiles)
 
                             for tile in adjacentZeroTiles:
                                 currentMinefield.field[tile].clickTile()
+                                tilesRemainingCount -= 1
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].clicked == False:
                             if currentMinefield.field[btn1].flagged == False:
@@ -421,7 +489,7 @@ def game(size, difficulty):
                         elif leftClick == True & rightClick == False & currentMinefield.field[btn1].flagged:
                             print("Tile", btn1, "currently flagged. Nothing changed.")     
                             
-                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked == True:
+                        elif leftClick == True & rightClick == False & currentMinefield.field[btn1].clicked:
                             print("Tile", btn, "already checked.")
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].flagged:
@@ -438,11 +506,13 @@ def game(size, difficulty):
                                     gameOver()
                                 else:
                                     currentMinefield.field[btn1].clickTile()
+                                    tilesRemainingCount -= 1
                                     adjacentZeroTiles = currentMinefield.checkForZeros(currentMinefield.field, btn1, size, [btn1])
 
                                     #print(adjacentZeroTiles)
 
                                     for tile in adjacentZeroTiles:
+                                        tilesRemainingCount -= 1
                                         currentMinefield.field[tile].clickTile()
 
                             else:
@@ -453,6 +523,7 @@ def game(size, difficulty):
                                     gameOver()
                                 else:
                                     print("No bomb. Continue.")
+                                    tilesRemainingCount -= 1
                                     currentMinefield.field[btn1].clickTile()
                     
         btn = 0
@@ -489,15 +560,32 @@ def game(size, difficulty):
 
                 screen.blit(redFlag, redFlag.get_rect(center=currentMinefield.field[btn].button.center))
 
-        tilesRemainingCount = 0
-
-        for btn2 in range(len(currentMinefield.field)):
-            if currentMinefield.field[btn2].clicked == False:
-                tilesRemainingCount += 1
-
         if tilesRemainingCount == len(ml.minesLaid):
             gameWin()
 
         pygame.display.update()
 
-startMenu()
+def gameLoader():
+
+    if os.path.isfile("settings.sav"):
+        savefile = open('settings.sav')
+        save = savefile.read()
+        savedSettings = save.split(",")
+        savefile.close()
+        if len(savedSettings) != 3:
+            defaultSettings = open('settings.sav', 'w')
+            defaultSettings.truncate(0)
+            defaultSettings.write("15,35,1")
+            defaultSettings.close()
+            print("Saved settings corrupted. Overwritten with default settings.")
+            gameLoader()
+        else:
+            startMenu(savedSettings[0], savedSettings[1], savedSettings[2])
+    else:
+        defaultSettings = open('settings.sav', 'w')
+        defaultSettings.write("15,35,1")
+        defaultSettings.close()
+        print("No saved settings detected. Default saved settings generated.")
+        gameLoader()
+
+gameLoader()
