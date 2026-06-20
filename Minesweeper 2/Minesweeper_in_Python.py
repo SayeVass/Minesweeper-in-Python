@@ -247,6 +247,7 @@ def startMenu(savedBoardSize, savedCustomSize, savedDifficulty):
                     savefile.write(str(customButton.value))
                     savefile.write(',')
                     savefile.write(str(saveDifficulty))
+                    savefile.close()
                     print("Current settings saved.")
 
                 elif playButton.rectangle.collidepoint(mouse):
@@ -418,8 +419,6 @@ def game(size, difficulty):
     redFlag = pygame.image.load('flag.png')
     redFlag = pygame.transform.scale(redFlag, (buttonSize, buttonSize))
 
-    tilesRemainingCount = size * size
-
     i = 0
 
     for i in range(len(fakeMinefield.field)):
@@ -431,6 +430,8 @@ def game(size, difficulty):
         fakeMinefield.field[i].button = pygame.Rect(btnPosHgt, btnPosWid, buttonSize, buttonSize)
 
     while True:
+
+        winFlag = True
 
         pygame.event.pump()
 
@@ -470,14 +471,12 @@ def game(size, difficulty):
                                 mf.field[btnLocation].button = fakeMinefield.field[btnLocation].button
 
                             currentMinefield.field[btn1].clickTile()
-                            tilesRemainingCount -= 1
                             adjacentZeroTiles = currentMinefield.checkForZeros(currentMinefield.field, btn1, size, [btn1])
 
                             #print(adjacentZeroTiles)
 
                             for tile in adjacentZeroTiles:
                                 currentMinefield.field[tile].clickTile()
-                                tilesRemainingCount -= 1
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].clicked == False:
                             if currentMinefield.field[btn1].flagged == False:
@@ -506,13 +505,11 @@ def game(size, difficulty):
                                     gameOver()
                                 else:
                                     currentMinefield.field[btn1].clickTile()
-                                    tilesRemainingCount -= 1
                                     adjacentZeroTiles = currentMinefield.checkForZeros(currentMinefield.field, btn1, size, [btn1])
 
                                     #print(adjacentZeroTiles)
 
                                     for tile in adjacentZeroTiles:
-                                        tilesRemainingCount -= 1
                                         currentMinefield.field[tile].clickTile()
 
                             else:
@@ -523,7 +520,6 @@ def game(size, difficulty):
                                     gameOver()
                                 else:
                                     print("No bomb. Continue.")
-                                    tilesRemainingCount -= 1
                                     currentMinefield.field[btn1].clickTile()
                     
         btn = 0
@@ -560,8 +556,13 @@ def game(size, difficulty):
 
                 screen.blit(redFlag, redFlag.get_rect(center=currentMinefield.field[btn].button.center))
 
-        if tilesRemainingCount == len(ml.minesLaid):
-            gameWin()
+        if currentMinefield != fakeMinefield:
+            for checkTile in range(len(currentMinefield.field)):
+                if currentMinefield.field[checkTile].clicked == False and currentMinefield.field[checkTile].bomb == False:
+                    winFlag = False
+
+            if winFlag == True:
+                gameWin()
 
         pygame.display.update()
 
