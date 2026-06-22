@@ -5,6 +5,7 @@
 
 # Saved Settings files
 *.sav
+*.scores
 
 # User-specific files
 *.rsuser

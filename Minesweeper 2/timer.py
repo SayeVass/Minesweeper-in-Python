@@ -8,7 +8,7 @@ class Timer():
 
     def getTime(self):
 
-        if (datetime.datetime.now() - self.lastCheckDatetime).total_seconds() >= 1 and self.timeRemaining >= datetime.time(0,0,0):
+        if (datetime.datetime.now() - self.lastCheckDatetime).total_seconds() >= 1 and self.timeRemaining > datetime.time(0,0,0):
             self.lastCheckDatetime = datetime.datetime.now()
             
             if self.timeRemaining.second == 0:

@@ -27,6 +27,8 @@
     <Compile Include="minelayer.py" />
     <Compile Include="Minesweeper_in_Python.py" />
     <Compile Include="optionButton.py" />
+    <Compile Include="scoreRecord.py" />
+    <Compile Include="scoreSystem.py" />
     <Compile Include="tile.py" />
     <Compile Include="timer.py" />
   </ItemGroup>

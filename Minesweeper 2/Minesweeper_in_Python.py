@@ -5,6 +5,7 @@ import sys
 import minefield
 import minelayer
 import optionButton
+import scoreSystem
 import timer
 
 pygame.init()
@@ -50,7 +51,7 @@ def startMenu(savedBoardSize, savedCustomSize, savedDifficulty):
     playButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) - 160, (screenSize * .6) - 25, 140, 50), 0, False)
     quitButton = optionButton.OptionButton(pygame.Rect((screenSize / 2) + 20, (screenSize * .6) - 25, 140, 50), 0, False)
 
-    saveButton = optionButton.OptionButton(pygame.Rect(screenSize - 205, screenSize - 35, 200, 30), 0, False)
+    saveButton = optionButton.OptionButton(pygame.Rect(screenSize - 205, screenSize + 60 - 35, 200, 30), 0, False)
 
     #Clicking the saved settings
     match savedBoardSize:
@@ -364,7 +365,7 @@ def gameOver():
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if restartButton.collidepoint(mouse):
-                    gameLoader()
+                    saveLoader()
 
                 if quitButton.collidepoint(mouse):
                     pygame.quit()
@@ -372,24 +373,54 @@ def gameOver():
 
         pygame.display.update()
 
-def gameWin():
+def gameWin(size, difficulty, timeLeft):
+
+    score = scoreSystem.ScoreSystem()
+
+    highScores = score.scoreLoader()
+
+    gameScore = score.scoreCalculator(size, difficulty, timeLeft)
+
+    if score.scoreChecker(highScores, gameScore):
+        name = highScore()
+
+        highScores = score.scoreUpdater(highScores, name, gameScore)
+
+        score.scoreWriter(highScores)
+
+    winText = font.render("You Win! Yippee!", True, WHITE)
+
+    scoreTableCaption = font.render("High Scores", True, WHITE)
+
+    nameList = []
+    scoreList = []
+
+    for record in range(len(highScores)):
+        nameList.append(font.render(str(highScores[record].getName()), True, WHITE))
+        scoreList.append(font.render(str(highScores[record].getScore()), True, WHITE))
+
+    restartText = font.render("Restart", True, WHITE)
+    quitText = font.render("Quit", True, WHITE)
+
+    restartButton = pygame.Rect(screenSize / 2 - 160, screenSize * .8, 140, 50)
+    quitButton = pygame.Rect(screenSize / 2 + 20, screenSize * .8, 140, 50)
+
+    screen.fill(BG)
 
     while True:
 
-        screen.fill(BG)
         mouse = pygame.mouse.get_pos()
-
-        restartButton = pygame.Rect(300, 300, 140, 50)
-        quitButton = pygame.Rect(300, 380, 140, 50)
 
         pygame.draw.rect(screen, LIGHT if restartButton.collidepoint(mouse) else DARK, restartButton)
         pygame.draw.rect(screen, LIGHT if quitButton.collidepoint(mouse) else DARK, quitButton)
 
-        winText = font.render("You Win! Yippee!", True, WHITE)
-        restartText = font.render("Restart", True, WHITE)
-        quitText = font.render("Quit", True, WHITE)
+        screen.blit(winText, (screenSize / 2 - 80, 20))
+        screen.blit(scoreTableCaption, (screenSize / 2 - 30, 80))
 
-        screen.blit(winText, (300, 150))
+        for recordagain in range(len(highScores)):
+            screen.blit(nameList[recordagain], (screenSize / 2 - 150, (60+screenSize) / 4 + (recordagain * 35)))
+            screen.blit(scoreList[recordagain], (screenSize / 2 + 10, (60+screenSize) / 4 + (recordagain * 35)))
+
         screen.blit(restartText, restartText.get_rect(center=restartButton.center))
         screen.blit(quitText, quitText.get_rect(center=quitButton.center))
 
@@ -402,11 +433,73 @@ def gameWin():
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if restartButton.collidepoint(mouse):
-                    gameLoader()
+                    saveLoader()
 
                 if quitButton.collidepoint(mouse):
                     pygame.quit()
                     sys.exit()
+
+        pygame.display.update()
+
+def highScore():
+
+    name = ""
+    tick = 0
+
+    congratsText = font.render("Congratulations!", True, WHITE)
+    highScoreText = font.render("New High Score!", True, WHITE)
+
+    enterNameText = font.render("Enter Your Name:", True, WHITE)
+
+    continueText = font.render("Continue", True, WHITE)
+
+    inputBox = pygame.Rect(screenSize / 2 - 60, (60 + screenSize) * .6, 120, 50)
+    continueBox = pygame.Rect(screenSize / 2 - 60, (60 + screenSize) * .6 + 70, 120, 50)
+
+    screen.fill(BG)
+    
+    pygame.event.pump()
+
+    while True:
+
+        mouse = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                if event.button == 1 and continueBox.collidepoint(mouse):
+
+                    return name
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_BACKSPACE and len(name) > 0:
+                    name = name[:-1]
+                elif event.unicode.isalpha() and len(name) < 15:
+                    name += event.unicode
+
+        pygame.draw.rect(screen, WHITE, inputBox)
+        pygame.draw.rect(screen, LIGHT if continueBox.collidepoint(mouse) else DARK, continueBox)
+
+        screen.blit(congratsText, (screenSize / 2 - 60, 10))
+        screen.blit(highScoreText, (screenSize / 2 - 50, 50))
+        screen.blit(enterNameText, (screenSize / 2 - 50, screenSize / 2))
+
+        if tick < 499:
+            inputText = font.render(name, True, BLACK)
+            screen.blit(inputText, inputText.get_rect(midleft=inputBox.midleft))
+        else:
+            inputText = font.render(name + "|", True, BLACK)
+            screen.blit(inputText, inputText.get_rect(midleft=inputBox.midleft))
+
+        tick = (tick + 1) % 1000
+
+        screen.blit(continueText, continueText.get_rect(center=continueBox.center))
 
         pygame.display.update()
 
@@ -490,7 +583,8 @@ def game(size, difficulty):
                             #print(adjacentZeroTiles)
 
                             for tile in adjacentZeroTiles:
-                                currentMinefield.field[tile].clickTile()
+                                if currentMinefield.field[tile].flagged == False: 
+                                    currentMinefield.field[tile].clickTile()
 
                         elif leftClick == False & rightClick == True & currentMinefield.field[btn1].clicked == False:
                             if currentMinefield.field[btn1].flagged == False:
@@ -524,7 +618,8 @@ def game(size, difficulty):
                                     #print(adjacentZeroTiles)
 
                                     for tile in adjacentZeroTiles:
-                                        currentMinefield.field[tile].clickTile()
+                                        if currentMinefield.field[tile].flagged == False: 
+                                            currentMinefield.field[tile].clickTile()
 
                             else:
 
@@ -542,7 +637,7 @@ def game(size, difficulty):
                                     winFlag = False
 
                             if winFlag == True:
-                                gameWin()
+                                gameWin(size, difficulty, gameTimer.getTime())
         
         if currentMinefield != fakeMinefield:
             shownTime = clockFont.render(str(gameTimer.getTime())[3:], True, WHITE)
@@ -585,7 +680,7 @@ def game(size, difficulty):
         
         pygame.display.update()
 
-def gameLoader():
+def saveLoader():
 
     if os.path.isfile("settings.sav"):
         savefile = open('settings.sav')
@@ -598,7 +693,7 @@ def gameLoader():
             defaultSettings.write("15,35,1")
             defaultSettings.close()
             print("Saved settings corrupted. Overwritten with default settings.")
-            gameLoader()
+            saveLoader()
         else:
             startMenu(savedSettings[0], savedSettings[1], savedSettings[2])
     else:
@@ -606,6 +701,6 @@ def gameLoader():
         defaultSettings.write("15,35,1")
         defaultSettings.close()
         print("No saved settings detected. Default saved settings generated.")
-        gameLoader()
+        saveLoader()
 
-gameLoader()
+saveLoader()
