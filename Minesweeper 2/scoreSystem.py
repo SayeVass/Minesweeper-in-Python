@@ -18,7 +18,7 @@ class ScoreSystem():
 
         secondsLeft = (timeLeft.second + (timeLeft.minute * 60))
 
-        score = math.ceil(secondsLeft * (size / 100) * diffMultiplier)
+        score = math.ceil(secondsLeft * size * diffMultiplier)
 
         return score
 

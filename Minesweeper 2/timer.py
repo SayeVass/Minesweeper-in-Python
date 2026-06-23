@@ -2,7 +2,7 @@ import datetime
 
 class Timer():
 
-    timeRemaining = datetime.time(0, 10, 0)
+    timeRemaining = datetime.time(0, 15, 0)
 
     lastCheckDatetime = datetime.datetime.now()
 
